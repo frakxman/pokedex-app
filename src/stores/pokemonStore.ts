@@ -111,9 +111,66 @@ export const usePokemonStore = defineStore('pokemon', {
       const types = pokemon.details.types.map(t => t.type.name).join(', ');
       const shareText = `Name: ${pokemon.name}, Weight: ${pokemon.details.weight}, Height: ${pokemon.details.height}, Types: ${types}`;
       
-      // Intentar copiar al portapapeles
-      navigator.clipboard.writeText(shareText).catch(err => {
-        console.error('Could not copy text to clipboard:', err);
+      // Log de la información que se copiará al portapapeles
+      console.log('Intentando copiar al portapapeles:', shareText);
+      
+      // Método principal usando Clipboard API
+      const copyWithClipboardAPI = () => {
+        return navigator.clipboard.writeText(shareText)
+          .then(() => {
+            console.log('Copiado exitosamente con Clipboard API');
+            return true;
+          })
+          .catch(err => {
+            console.error('Error con Clipboard API:', err);
+            return false;
+          });
+      };
+      
+      // Método de respaldo usando document.execCommand (método antiguo)
+      const copyWithExecCommand = () => {
+        try {
+          // Crear un elemento temporal
+          const textArea = document.createElement('textarea');
+          textArea.value = shareText;
+          
+          // Asegurarse de que esté fuera de la vista
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          // Intentar copiar el texto
+          const success = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          
+          if (success) {
+            console.log('Copiado exitosamente con execCommand');
+            return true;
+          } else {
+            console.error('execCommand falló sin error');
+            return false;
+          }
+        } catch (err) {
+          console.error('Error con execCommand:', err);
+          return false;
+        }
+      };
+      
+      // Intentar con ambos métodos
+      copyWithClipboardAPI().then(success => {
+        if (!success) {
+          const backupSuccess = copyWithExecCommand();
+          if (!backupSuccess) {
+            console.error('No se pudo copiar al portapapeles con ningún método');
+            // Almacenar en localStorage como último recurso
+            localStorage.setItem('lastSharedPokemon', shareText);
+            console.log('Guardado en localStorage como último recurso');
+          }
+        }
       });
       
       return shareText;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { fetchPokemonDetailsFromStore, toggleFavoriteInStore, sharePokemonFromStore } from '../services/pokemonService';
+import { fetchPokemonDetailsFromStore, toggleFavoriteInStore } from '../services/pokemonService';
 import type { Pokemon } from '../interfaces/Pokemon';
 import type { PokemonDetails } from '../interfaces/PokemonDetails';
 // Importar imágenes
@@ -54,13 +54,37 @@ const toggleFavoriteStatus = (event: Event) => {
 
 // Función para compartir
 const handleShare = () => {
-  if (pokemon.value) {
-    const result = sharePokemonFromStore(pokemon.value);
-    if (result) {
-      shareStatus.value = 'Copied to clipboard!';
+  if (pokemon.value && details.value) {
+    try {
+      // Crear el texto a compartir
+      const types = details.value.types.map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1)).join(', ');
+      const shareText = `Name: ${pokemon.value.name}, Weight: ${details.value.weight}kg, Height: ${details.value.height / 10}m, Types: ${types}`;
+      
+      // Crear un elemento input temporal
+      const textInput = document.createElement('input');
+      textInput.value = shareText;
+      
+      // Estilos para esconder el input
+      textInput.style.position = 'absolute';
+      textInput.style.left = '-9999px';
+      
+      // Añadir al DOM
+      document.body.appendChild(textInput);
+      
+      // Seleccionar y copiar
+      textInput.select();
+      document.execCommand('copy');
+      
+      // Eliminar el input
+      document.body.removeChild(textInput);
+      
+      // Mostrar confirmación temporal
+      shareStatus.value = 'copied';
       setTimeout(() => {
         shareStatus.value = '';
       }, 2000);
+    } catch (error) {
+      console.error('Error al copiar:', error);
     }
   }
 };
@@ -124,7 +148,7 @@ const closeModal = () => {
         <div class="action-buttons">
           <button class="share-button" @click="handleShare">
             Share to my friends
-            <span v-if="shareStatus" class="share-status">{{ shareStatus }}</span>
+            <span v-if="shareStatus === 'copied'" class="share-confirmation">Copied!</span>
           </button>
           <span 
             class="favorite-button" 
@@ -272,16 +296,28 @@ const closeModal = () => {
   cursor: pointer;
   flex-grow: 1;
   margin-right: 15px;
+  overflow: hidden;
 }
 
-.share-status {
+.share-confirmation {
   position: absolute;
-  bottom: -20px;
+  top: 0;
   left: 0;
-  width: 100%;
-  text-align: center;
-  font-size: 12px;
-  color: #333;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInOut 2s forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .favorite-button {
@@ -339,5 +375,14 @@ const closeModal = () => {
   .modal-container {
     max-width: 600px;
   }
+}
+
+/* Remove the share section styles */
+.share-section, 
+.share-info, 
+.share-text, 
+.share-actions, 
+.copy-button {
+  display: none;
 }
 </style>

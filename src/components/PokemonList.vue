@@ -97,6 +97,37 @@ const showFavorites = () => {
   router.push('/favorites');
 };
 
+// Función para volver al inicio de la lista
+const scrollToTop = () => {
+  try {
+    // Obtener el primer elemento de la lista
+    const firstElement = document.querySelector('.search-container');
+    if (firstElement) {
+      firstElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    } else {
+      // Como respaldo, usar el método tradicional
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
+    // Respaldo adicional en caso de que el scrollIntoView suave falle
+    setTimeout(() => {
+      if (window.scrollY > 10) {
+        window.scrollTo(0, 0);
+      }
+    }, 600);
+  } catch (error) {
+    // Método de respaldo final si hay algún error
+    console.error('Error en scrollToTop:', error);
+    window.scrollTo(0, 0);
+  }
+};
+
 // Cargar la primera página de Pokémon
 onMounted(async () => {
   try {
@@ -162,14 +193,31 @@ onMounted(async () => {
         <p>Loading more Pokémon...</p>
       </div>
       
-      <!-- Botón para cargar más Pokémon -->
-      <button 
-        v-if="!loadingMore && hasMorePokemon && searchQuery === ''" 
-        @click="loadMorePokemonHandler" 
-        class="load-more-button"
-      >
-        Load More Pokémon
-      </button>
+      <!-- Botones de navegación al final de la lista -->
+      <div class="navigation-buttons" v-if="!searchQuery">
+        <button 
+          v-if="!loadingMore && hasMorePokemon" 
+          @click="loadMorePokemonHandler" 
+          class="nav-button load-more-button"
+          title="Cargar más pokemones"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        
+        <button 
+          @click="scrollToTop" 
+          class="nav-button scroll-top-button"
+          title="Volver al inicio"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+        </button>
+      </div>
     </div>
     
     <!-- Footer fijo con botones -->
@@ -401,18 +449,42 @@ onMounted(async () => {
   display: none;
 }
 
-.load-more-button {
-  margin: 20px auto;
-  padding: 12px 24px;
-  background-color: #f33;
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  position: static;
+  z-index: 99;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background-color: #ee6b2f;
   color: white;
   border: none;
-  border-radius: 25px;
-  font-size: 16px;
-  font-weight: 500;
   cursor: pointer;
-  display: block;
-  width: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.nav-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-top-button {
+  background-color: #30a7d7;
 }
 
 /* Media queries para tablets */
@@ -455,6 +527,10 @@ onMounted(async () => {
   
   .filter-button {
     padding: 20px 0;
+  }
+  
+  .navigation-buttons {
+    right: calc(50% - 340px);
   }
 }
 
