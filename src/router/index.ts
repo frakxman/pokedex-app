@@ -1,42 +1,66 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import WelcomeView from '../views/WelcomeView.vue'
-import ListView from '../views/ListView.vue'
-import FavoritesView from '../views/FavoritesView.vue'
-import DetailView from '../views/DetailView.vue'
-import ErrorView from '../views/ErrorView.vue'
+import HomeView from '../views/HomeView.vue'
+import WelcomeScreen from '../components/WelcomeScreen.vue'
+import LoadingScreen from '../components/LoadingScreen.vue'
+import EmptyListScreen from '../components/EmptyListScreen.vue'
+import PokemonList from '../components/PokemonList.vue'
+import FavoritesList from '../components/FavoritesList.vue'
+import PokemonDetails from '../components/PokemonDetails.vue'
+import NotFoundScreen from '../components/NotFoundScreen.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'welcome',
-    component: WelcomeView
+    component: WelcomeScreen,
+    meta: { transition: 'slide-left' }
+  },
+  {
+    path: '/loading',
+    component: LoadingScreen,
+    meta: { transition: 'fade' }
+  },
+  {
+    path: '/empty',
+    component: EmptyListScreen,
+    meta: { transition: 'fade' }
   },
   {
     path: '/list',
-    name: 'list',
-    component: ListView
+    component: PokemonList,
+    meta: { transition: 'slide-left' }
   },
   {
     path: '/favorites',
-    name: 'favorites',
-    component: FavoritesView
+    component: FavoritesList,
+    meta: { transition: 'slide-right' }
   },
   {
     path: '/pokemon/:id',
-    name: 'detail',
-    component: DetailView
+    component: PokemonDetails,
+    meta: { 
+      transition: 'fade',
+      modal: true
+    }
   },
   {
-    path: '/error',
-    name: 'error',
-    component: ErrorView
+    path: '/:pathMatch(.*)*',
+    component: NotFoundScreen,
+    meta: { transition: 'fade' }
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // Restaurar la posición de desplazamiento al navegar
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
 })
 
 export default router

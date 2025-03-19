@@ -1,18 +1,54 @@
 @import './base.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+/* Resetear estilos básicos */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: white;
+}
+
+body {
+  max-width: 100vw;
+  background-color: white;
+  min-height: 100vh;
+}
+
+/* Estilos para vista móvil */
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+}
+
+/* Estilos de botones globales */
+button {
+  font-family: inherit;
+  outline: none;
+}
+
+/* Ajustar el alto de los botones de filtro para todas las pantallas */
+.filter-button {
+  height: 52px; /* Para asegurar que tienen altura consistente */
+}
+
+/* Otros estilos globales pueden ir aquí */
 
 a,
 .green {
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
-  padding: 3px;
 }
 
 @media (hover: hover) {
@@ -25,11 +61,12 @@ a,
   body {
     display: flex;
     place-items: center;
+    background-color: white;
   }
 
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    width: 100%;
+    background-color: white;
+    padding: 0;
   }
 }
