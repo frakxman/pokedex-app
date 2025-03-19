@@ -357,7 +357,7 @@ onMounted(async () => {
 .filter-button {
   flex: 1;
   padding: 18px 0;
-  border-radius: 30px;
+  border-radius: 25px;
   border: none;
   display: flex;
   align-items: center;
@@ -366,22 +366,23 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 500;
   color: white;
+  transition: all 0.3s ease;
 }
 
 .all-button {
-  background-color: #f33;
+  background-color: #F22539;
 }
 
 .favorites-button {
-  background-color: #bbb;
+  background-color: #757575;
 }
 
 .all-button.inactive {
-  background-color: #bbb;
+  background-color: #757575;
 }
 
 .favorites-button.active {
-  background-color: #f33;
+  background-color: #F22539;
 }
 
 .list-icon {
@@ -421,15 +422,28 @@ onMounted(async () => {
 }
 
 .reset-button {
-  background-color: #f33;
+  background-color: #F22539;
   color: white;
   border: none;
   border-radius: 25px;
-  padding: 10px 24px;
+  padding: 12px 28px;
   font-size: 15px;
   cursor: pointer;
   font-weight: 500;
   margin-top: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.reset-button:hover {
+  background-color: #E01B2F;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.reset-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .load-more-indicator {
@@ -452,7 +466,7 @@ onMounted(async () => {
 .navigation-buttons {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 20px;
   margin: 1.5rem 0;
   position: static;
   z-index: 99;
@@ -465,26 +479,34 @@ onMounted(async () => {
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 50%;
-  background-color: #ee6b2f;
   color: white;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+}
+
+.nav-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.load-more-button {
+  background-color: #F22539;
+}
+
+.scroll-top-button {
+  background-color: #3663AD;
 }
 
 .nav-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
 }
 
 .nav-button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-.scroll-top-button {
-  background-color: #30a7d7;
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 /* Media queries para tablets */
@@ -527,10 +549,6 @@ onMounted(async () => {
   
   .filter-button {
     padding: 20px 0;
-  }
-  
-  .navigation-buttons {
-    right: calc(50% - 340px);
   }
 }
 

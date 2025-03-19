@@ -257,7 +257,7 @@ const resetSearch = () => {
 .filter-button {
   flex: 1;
   padding: 18px 0;
-  border-radius: 30px;
+  border-radius: 25px;
   border: none;
   display: flex;
   align-items: center;
@@ -266,22 +266,23 @@ const resetSearch = () => {
   font-size: 16px;
   font-weight: 500;
   color: white;
+  transition: all 0.3s ease;
 }
 
 .all-button {
-  background-color: #bbb;
+  background-color: #757575;
 }
 
 .favorites-button {
-  background-color: #f33;
+  background-color: #F22539;
 }
 
 .all-button.active {
-  background-color: #f33;
+  background-color: #F22539;
 }
 
 .favorites-button.inactive {
-  background-color: #bbb;
+  background-color: #757575;
 }
 
 .list-icon {
@@ -331,15 +332,29 @@ const resetSearch = () => {
   margin-bottom: 35px;
 }
 
-.reset-button, .home-button {
-  background-color: #f33;
+.reset-button {
+  background-color: #F22539;
   color: white;
   border: none;
   border-radius: 25px;
-  padding: 12px 24px;
+  padding: 12px 28px;
   font-size: 15px;
   cursor: pointer;
   font-weight: 500;
+  margin-top: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.reset-button:hover {
+  background-color: #E01B2F;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.reset-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .home-button {

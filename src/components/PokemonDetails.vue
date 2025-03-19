@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { fetchPokemonDetailsFromStore, toggleFavoriteInStore } from '../services/pokemonService';
 import type { Pokemon } from '../interfaces/Pokemon';
@@ -8,6 +8,7 @@ import type { PokemonDetails } from '../interfaces/PokemonDetails';
 import activeStar from '../assets/images/Active.png';
 import disabledStar from '../assets/images/Disabled.png';
 
+// Composición y configuración
 const router = useRouter();
 const route = useRoute();
 const pokemon = ref<Pokemon | null>(null);
@@ -16,22 +17,63 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const shareStatus = ref('');
 
-// Cargar los detalles del Pokémon al montar el componente
-onMounted(async () => {
+// Valores calculados
+const formattedTypes = computed(() => {
+  if (!details.value?.types) return '';
+  return details.value.types
+    .map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1))
+    .join(', ');
+});
+
+const formattedHeight = computed(() => {
+  return details.value ? (details.value.height / 10) + 'm' : '';
+});
+
+const formattedWeight = computed(() => {
+  return details.value ? details.value.weight + 'kg' : '';
+});
+
+// Función para generar el texto a compartir
+const generateShareText = (): string => {
+  if (!pokemon.value || !details.value) return '';
+  
+  return `Name: ${pokemon.value.name}, Weight: ${formattedWeight.value}, Height: ${formattedHeight.value}, Types: ${formattedTypes.value}`;
+};
+
+// Función para copiar texto al portapapeles
+const copyToClipboard = (text: string): boolean => {
+  try {
+    const textInput = document.createElement('input');
+    textInput.value = text;
+    textInput.style.position = 'absolute';
+    textInput.style.left = '-9999px';
+    
+    document.body.appendChild(textInput);
+    textInput.select();
+    
+    const success = document.execCommand('copy');
+    document.body.removeChild(textInput);
+    
+    return success;
+  } catch (error) {
+    console.error('Error al copiar:', error);
+    return false;
+  }
+};
+
+// Carga inicial de datos
+const loadPokemonDetails = async () => {
   try {
     loading.value = true;
     
-    // Obtener el Pokémon seleccionado del sessionStorage
     const pokemonData = sessionStorage.getItem('selectedPokemon');
     if (!pokemonData) {
       error.value = 'Pokemon not found';
-      loading.value = false;
       return;
     }
 
     pokemon.value = JSON.parse(pokemonData);
     
-    // Obtener los detalles del Pokémon usando el servicio
     if (pokemon.value) {
       const detailsData = await fetchPokemonDetailsFromStore(pokemon.value.name.toLowerCase());
       details.value = detailsData;
@@ -42,57 +84,42 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+};
 
-// Función para alternar favorito
+// Acciones de usuario
 const toggleFavoriteStatus = (event: Event) => {
   event.stopPropagation();
   if (pokemon.value) {
-    toggleFavoriteInStore(pokemon.value);
-  }
-};
-
-// Función para compartir
-const handleShare = () => {
-  if (pokemon.value && details.value) {
-    try {
-      // Crear el texto a compartir
-      const types = details.value.types.map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1)).join(', ');
-      const shareText = `Name: ${pokemon.value.name}, Weight: ${details.value.weight}kg, Height: ${details.value.height / 10}m, Types: ${types}`;
-      
-      // Crear un elemento input temporal
-      const textInput = document.createElement('input');
-      textInput.value = shareText;
-      
-      // Estilos para esconder el input
-      textInput.style.position = 'absolute';
-      textInput.style.left = '-9999px';
-      
-      // Añadir al DOM
-      document.body.appendChild(textInput);
-      
-      // Seleccionar y copiar
-      textInput.select();
-      document.execCommand('copy');
-      
-      // Eliminar el input
-      document.body.removeChild(textInput);
-      
-      // Mostrar confirmación temporal
-      shareStatus.value = 'copied';
-      setTimeout(() => {
-        shareStatus.value = '';
-      }, 2000);
-    } catch (error) {
-      console.error('Error al copiar:', error);
+    // Llamar a la función del store y actualizar el estado local
+    const updatedPokemon = toggleFavoriteInStore(pokemon.value);
+    
+    // Actualizar el estado local para reflejar el cambio inmediatamente
+    if (updatedPokemon) {
+      pokemon.value = { ...updatedPokemon };
     }
   }
 };
 
-// Cerrar el modal y volver atrás
+const handleShare = () => {
+  const shareText = generateShareText();
+  if (shareText && copyToClipboard(shareText)) {
+    showShareConfirmation();
+  }
+};
+
+const showShareConfirmation = () => {
+  shareStatus.value = 'copied';
+  setTimeout(() => {
+    shareStatus.value = '';
+  }, 2000);
+};
+
 const closeModal = () => {
   router.back();
 };
+
+// Inicialización
+onMounted(loadPokemonDetails);
 </script>
 
 <template>
@@ -132,15 +159,15 @@ const closeModal = () => {
           </div>
           
           <div class="info-item">
-            <p>Weight: {{ details.weight }}kg</p>
+            <p>Weight: {{ formattedWeight }}</p>
           </div>
           
           <div class="info-item">
-            <p>Height: {{ details.height / 10 }}m</p>
+            <p>Height: {{ formattedHeight }}</p>
           </div>
           
           <div class="info-item">
-            <p>Types: {{ details.types.map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1)).join(', ') }}</p>
+            <p>Types: {{ formattedTypes }}</p>
           </div>
         </div>
         
