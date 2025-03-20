@@ -18,9 +18,10 @@ A modern, responsive Pokedex application built with Vue 3, TypeScript, and Vite.
 - **Framework**: Vue 3
 - **Language**: TypeScript
 - **Build Tool**: Vite
-- **State Management**: Vue Composition API
-- **Styling**: CSS Modules
-- **Testing**: Vitest
+- **State Management**: Pinia
+- **Router**: Vue Router
+- **Styling**: Scoped CSS
+- **Testing**: Vitest with Vue Test Utils
 - **API**: PokeAPI v2
 
 ## 📋 Prerequisites
@@ -63,13 +64,15 @@ npm run test
 ```
 pokedex-app/
 ├── src/
-│   ├── components/     # Reusable Vue components
-│   ├── views/         # Page components
-│   ├── services/      # API and business logic
-│   ├── types/         # TypeScript type definitions
-│   ├── utils/         # Helper functions
+│   ├── assets/        # Images and static resources
+│   ├── components/    # Reusable Vue components
+│   ├── interfaces/    # TypeScript interfaces
+│   ├── router/        # Vue Router configuration
+│   ├── services/      # API and data services
+│   ├── stores/        # Pinia state stores
 │   └── tests/         # Test files
 ├── public/            # Static assets
+├── cypress/           # E2E test files
 └── index.html         # Entry HTML file
 ```
 
