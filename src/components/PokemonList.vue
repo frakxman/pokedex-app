@@ -9,28 +9,28 @@ import {
 import type { Pokemon } from '../interfaces/Pokemon';
 import { usePokemonStore } from '../stores/pokemonStore';
 import EmptyListScreen from './EmptyListScreen.vue';
-// Importar imágenes
+// Import images
 import activeStar from '../assets/images/Active.png';
 import disabledStar from '../assets/images/Disabled.png';
 
 const emit = defineEmits(['select-pokemon', 'show-favorites', 'show-empty']);
 
-// Acceder al store directamente
+// Access the store directly
 const pokemonStore = usePokemonStore();
 
-// Router para navegación
+// Router for navigation
 const router = useRouter();
 
-// Estado de la lista de Pokémon
+// State for Pokemon list
 const searchQuery = ref('');
 const loading = ref(false);
 const loadingMore = ref(false);
 const hasMorePokemon = ref(true);
 
-// Obtener la lista de Pokémon
+// Get the Pokemon list
 const pokemonList = computed(() => pokemonStore.getPokemonList);
 
-// Filtrar Pokémon por búsqueda
+// Filter Pokemon by search
 const filteredList = computed(() => {
   if (!searchQuery.value) {
     return pokemonList.value;
@@ -42,23 +42,23 @@ const filteredList = computed(() => {
   }
 });
 
-// Verificar si la búsqueda no tiene resultados
+// Check if search has no results
 const hasNoResults = computed(() => {
   return searchQuery.value !== '' && filteredList.value.length === 0;
 });
 
-// Cargar más Pokémon (con botón)
+// Load more Pokemon (with button)
 const loadMorePokemonHandler = async () => {
-  if (loadingMore.value || !hasMorePokemon.value) return;
+  if (loadingMore.value) return;
   
+  loadingMore.value = true;
   try {
-    loadingMore.value = true;
     const previousLength = pokemonList.value.length;
-    const newPokemonList = await loadMorePokemonFromStore();
+    await loadMorePokemonFromStore();
     
-    // Si después de cargar más, la longitud no ha cambiado,
-    // significa que no hay más Pokémon para cargar
-    if (newPokemonList.length === previousLength) {
+    // If after loading more, the length hasn't changed,
+    // it means there are no more Pokemon to load
+    if (pokemonList.value.length === previousLength) {
       hasMorePokemon.value = false;
     }
   } catch (error) {
@@ -68,39 +68,39 @@ const loadMorePokemonHandler = async () => {
   }
 };
 
-// Función para alternar favoritos
+// Function to toggle favorites
 const togglePokemonFavorite = (pokemon: Pokemon, event: Event) => {
   event.stopPropagation();
   toggleFavoriteInStore(pokemon);
 };
 
-// Limpiar búsqueda
+// Clear search
 const resetSearch = () => {
   searchQuery.value = '';
 };
 
-// Agregar esta función que falta
+// Add this function that's missing
 const handleSearchChange = () => {
-  // Esta función se llama cuando el usuario escribe en el campo de búsqueda
+  // This function is called when the user types in the search field
   console.log('Search query changed:', searchQuery.value);
 };
 
-// Función para seleccionar un Pokémon
+// Function to select a Pokemon
 const selectPokemon = (pokemon: Pokemon) => {
-  // Guardamos el Pokémon en el store o sessionStorage para acceder desde la página de detalles
+  // Save the Pokemon in the store or sessionStorage for access from the details page
   sessionStorage.setItem('selectedPokemon', JSON.stringify(pokemon));
   router.push(`/pokemon/${pokemon.id}`);
 };
 
-// Mostrar favoritos
+// Show favorites
 const showFavorites = () => {
   router.push('/favorites');
 };
 
-// Función para volver al inicio de la lista
+// Function to scroll to the top of the list
 const scrollToTop = () => {
   try {
-    // Obtener el primer elemento de la lista
+    // Get the first element of the list
     const firstElement = document.querySelector('.search-container');
     if (firstElement) {
       firstElement.scrollIntoView({ 
@@ -108,27 +108,27 @@ const scrollToTop = () => {
         block: 'start' 
       });
     } else {
-      // Como respaldo, usar el método tradicional
+      // As a fallback, use the traditional method
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
     }
     
-    // Respaldo adicional en caso de que el scrollIntoView suave falle
+    // Additional fallback in case the smooth scroll fails
     setTimeout(() => {
       if (window.scrollY > 10) {
         window.scrollTo(0, 0);
       }
     }, 600);
   } catch (error) {
-    // Método de respaldo final si hay algún error
-    console.error('Error en scrollToTop:', error);
+    // Final fallback method if there's any error
+    console.error('Error in scrollToTop:', error);
     window.scrollTo(0, 0);
   }
 };
 
-// Cargar la primera página de Pokémon
+// Load the first page of Pokemon
 onMounted(async () => {
   try {
     loading.value = true;
@@ -154,19 +154,19 @@ onMounted(async () => {
       </div>
     </div>
     
-    <!-- Mostrar mensaje de no resultados -->
+    <!-- Show no results message -->
     <div v-if="hasNoResults" class="empty-content">
       <h2 class="title">Uh-oh!</h2>
       <p class="subtitle">You look lost on your journey!</p>
       <button class="reset-button" @click="resetSearch">Go back home</button>
     </div>
     
-    <!-- Mostrar indicador de carga -->
+    <!-- Show loading indicator -->
     <div v-else-if="loading" class="loading-indicator">
       <p>Loading Pokémon...</p>
     </div>
     
-    <!-- Mostrar la lista de Pokémon cuando están cargados -->
+    <!-- Show the Pokemon list when loaded -->
     <div v-else class="pokemon-list">
       <button 
         v-for="pokemon in filteredList" 
@@ -188,18 +188,18 @@ onMounted(async () => {
         </span>
       </button>
       
-      <!-- Indicador de carga para más Pokémon -->
+      <!-- Loading indicator for more Pokemon -->
       <div v-if="loadingMore" class="load-more-indicator">
         <p>Loading more Pokémon...</p>
       </div>
       
-      <!-- Botones de navegación al final de la lista -->
+      <!-- Navigation buttons at the end of the list -->
       <div class="navigation-buttons" v-if="!searchQuery">
         <button 
           v-if="!loadingMore && hasMorePokemon" 
           @click="loadMorePokemonHandler" 
           class="nav-button load-more-button"
-          title="Cargar más pokemones"
+          title="Load more pokemones"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -210,7 +210,7 @@ onMounted(async () => {
         <button 
           @click="scrollToTop" 
           class="nav-button scroll-top-button"
-          title="Volver al inicio"
+          title="Scroll to top"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -220,7 +220,7 @@ onMounted(async () => {
       </div>
     </div>
     
-    <!-- Footer fijo con botones -->
+    <!-- Fixed footer with buttons -->
     <div class="footer">
       <div class="filter-buttons">
         <button class="filter-button all-button active">
@@ -283,7 +283,7 @@ onMounted(async () => {
   background-color: white;
 }
 
-/* Lista de Pokémon en formato vertical */
+/* Pokemon list in vertical format */
 .pokemon-list {
   display: flex;
   flex-direction: column;
@@ -294,7 +294,7 @@ onMounted(async () => {
   padding-bottom: 120px;
 }
 
-/* Cada elemento Pokémon es un botón completo */
+/* Each Pokemon element is a complete button */
 .pokemon-item {
   display: flex;
   justify-content: space-between;
@@ -509,7 +509,7 @@ onMounted(async () => {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-/* Media queries para tablets */
+/* Media queries for tablets */
 @media (min-width: 768px) {
   .list-container {
     max-width: 100%;
@@ -530,7 +530,7 @@ onMounted(async () => {
   }
 }
 
-/* Media queries para desktops */
+/* Media queries for desktops */
 @media (min-width: 1024px) {
   .list-container {
     max-width: 582px;
@@ -552,7 +552,7 @@ onMounted(async () => {
   }
 }
 
-/* Media queries para pantallas grandes */
+/* Media queries for large screens */
 @media (min-width: 1400px) {
   .list-container {
     max-width: 582px;

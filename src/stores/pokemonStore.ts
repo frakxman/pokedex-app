@@ -4,7 +4,7 @@ import { fetchPokemonList as fetchPokemonListService,
          fetchPokemonDetails as fetchPokemonDetailsService,
          loadMorePokemon as loadMorePokemonService } from '../services/pokemonService';
 
-// Store para manejar el estado global de Pokémon usando Pinia
+// Store to handle global Pokemon state using Pinia
 export const usePokemonStore = defineStore('pokemon', {
   state: () => ({
     pokemonList: [] as Pokemon[],
@@ -25,7 +25,7 @@ export const usePokemonStore = defineStore('pokemon', {
       try {
         this.pokemonList = await fetchPokemonListService();
         
-        // Verificar cuáles están en favoritos
+        // Check which ones are in favorites
         this.pokemonList = this.pokemonList.map(pokemon => {
           const isFavorite = this.favorites.some(f => f.id === pokemon.id);
           return { ...pokemon, favorite: isFavorite };
@@ -44,7 +44,7 @@ export const usePokemonStore = defineStore('pokemon', {
       try {
         const details = await fetchPokemonDetailsService(name);
         
-        // Actualizar detalles en el Pokémon correspondiente
+        // Update details in the corresponding Pokemon
         const index = this.pokemonList.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
         if (index !== -1) {
           this.pokemonList[index].details = details;
@@ -61,16 +61,16 @@ export const usePokemonStore = defineStore('pokemon', {
       const index = this.pokemonList.findIndex(p => p.id === pokemon.id);
       
       if (index !== -1) {
-        // Toggle el estado de favorito
+        // Toggle favorite status
         this.pokemonList[index].favorite = !this.pokemonList[index].favorite;
         
         if (this.pokemonList[index].favorite) {
-          // Agregar a favoritos si no existe
+          // Add to favorites if it doesn't exist
           if (!this.favorites.some(f => f.id === pokemon.id)) {
             this.favorites.push({...this.pokemonList[index]});
           }
         } else {
-          // Quitar de favoritos
+          // Remove from favorites
           this.favorites = this.favorites.filter(f => f.id !== pokemon.id);
         }
         
@@ -80,7 +80,7 @@ export const usePokemonStore = defineStore('pokemon', {
       return pokemon;
     },
     
-    // Función para cargar más Pokémon
+    // Function to load more Pokemon
     async loadMorePokemon() {
       const offset = this.pokemonList.length;
       
@@ -88,7 +88,7 @@ export const usePokemonStore = defineStore('pokemon', {
         this.isLoading = true;
         const newPokemonList = await loadMorePokemonService(offset);
         
-        // Verificar cuáles están en favoritos
+        // Check which ones are in favorites
         const newPokemonWithFavorites = newPokemonList.map(pokemon => {
           const isFavorite = this.favorites.some(f => f.id === pokemon.id);
           return { ...pokemon, favorite: isFavorite };
@@ -104,37 +104,37 @@ export const usePokemonStore = defineStore('pokemon', {
       }
     },
     
-    // Copiar información del Pokémon al portapapeles
+    // Copy Pokemon information to clipboard
     sharePokemon(pokemon: Pokemon) {
       if (!pokemon.details) return '';
       
       const types = pokemon.details.types.map(t => t.type.name).join(', ');
       const shareText = `Name: ${pokemon.name}, Weight: ${pokemon.details.weight}, Height: ${pokemon.details.height}, Types: ${types}`;
       
-      // Log de la información que se copiará al portapapeles
-      console.log('Intentando copiar al portapapeles:', shareText);
+      // Log of the information that will be copied to clipboard
+      console.log('Attempting to copy to clipboard:', shareText);
       
-      // Método principal usando Clipboard API
+      // Main method using Clipboard API
       const copyWithClipboardAPI = () => {
         return navigator.clipboard.writeText(shareText)
           .then(() => {
-            console.log('Copiado exitosamente con Clipboard API');
+            console.log('Successfully copied with Clipboard API');
             return true;
           })
           .catch(err => {
-            console.error('Error con Clipboard API:', err);
+            console.error('Error with Clipboard API:', err);
             return false;
           });
       };
       
-      // Método de respaldo usando document.execCommand (método antiguo)
+      // Fallback method using document.execCommand (old method)
       const copyWithExecCommand = () => {
         try {
-          // Crear un elemento temporal
+          // Create a temporary element
           const textArea = document.createElement('textarea');
           textArea.value = shareText;
           
-          // Asegurarse de que esté fuera de la vista
+          // Make sure it's out of view
           textArea.style.position = 'fixed';
           textArea.style.left = '-999999px';
           textArea.style.top = '-999999px';
@@ -143,32 +143,32 @@ export const usePokemonStore = defineStore('pokemon', {
           textArea.focus();
           textArea.select();
           
-          // Intentar copiar el texto
+          // Try to copy the text
           const success = document.execCommand('copy');
           document.body.removeChild(textArea);
           
           if (success) {
-            console.log('Copiado exitosamente con execCommand');
+            console.log('Successfully copied with execCommand');
             return true;
           } else {
-            console.error('execCommand falló sin error');
+            console.error('execCommand failed without error');
             return false;
           }
         } catch (err) {
-          console.error('Error con execCommand:', err);
+          console.error('Error with execCommand:', err);
           return false;
         }
       };
       
-      // Intentar con ambos métodos
+      // Try with both methods
       copyWithClipboardAPI().then(success => {
         if (!success) {
           const backupSuccess = copyWithExecCommand();
           if (!backupSuccess) {
-            console.error('No se pudo copiar al portapapeles con ningún método');
-            // Almacenar en localStorage como último recurso
+            console.error('Could not copy to clipboard with any method');
+            // Store in localStorage as a last resort
             localStorage.setItem('lastSharedPokemon', shareText);
-            console.log('Guardado en localStorage como último recurso');
+            console.log('Saved in localStorage as a last resort');
           }
         }
       });

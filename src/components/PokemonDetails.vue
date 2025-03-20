@@ -4,11 +4,11 @@ import { useRouter, useRoute } from 'vue-router';
 import { fetchPokemonDetailsFromStore, toggleFavoriteInStore } from '../services/pokemonService';
 import type { Pokemon } from '../interfaces/Pokemon';
 import type { PokemonDetails } from '../interfaces/PokemonDetails';
-// Importar imágenes
+// Import images
 import activeStar from '../assets/images/Active.png';
 import disabledStar from '../assets/images/Disabled.png';
 
-// Composición y configuración
+// Composition and configuration
 const router = useRouter();
 const route = useRoute();
 const pokemon = ref<Pokemon | null>(null);
@@ -17,7 +17,7 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const shareStatus = ref('');
 
-// Valores calculados
+// Computed values
 const formattedTypes = computed(() => {
   if (!details.value?.types) return '';
   return details.value.types
@@ -33,118 +33,140 @@ const formattedWeight = computed(() => {
   return details.value ? details.value.weight + 'kg' : '';
 });
 
-// Función para generar el texto a compartir
+// Function to generate text to share
 const generateShareText = (): string => {
   if (!pokemon.value || !details.value) return '';
   
   return `Name: ${pokemon.value.name}, Weight: ${formattedWeight.value}, Height: ${formattedHeight.value}, Types: ${formattedTypes.value}`;
 };
 
-// Función para copiar texto al portapapeles
+// Function to copy text to clipboard - simplified
 const copyToClipboard = (text: string): boolean => {
   try {
-    const textInput = document.createElement('input');
-    textInput.value = text;
-    textInput.style.position = 'absolute';
-    textInput.style.left = '-9999px';
+    // Try the modern Clipboard API first 
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text);
+      return true;
+    }
     
-    document.body.appendChild(textInput);
-    textInput.select();
+    // Fallback to legacy method
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
     
-    const success = document.execCommand('copy');
-    document.body.removeChild(textInput);
+    // Avoid scrolling to bottom
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
     
-    return success;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      const success = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return success;
+    } catch (err) {
+      document.body.removeChild(textArea);
+      console.error('Error with execCommand:', err);
+      return false;
+    }
   } catch (error) {
-    console.error('Error al copiar:', error);
+    console.error('Error copying to clipboard:', error);
     return false;
   }
 };
 
-// Carga inicial de datos
-const loadPokemonDetails = async () => {
+// Function to copy Pokemon information to clipboard - simplified
+const sharePokemon = () => {
   try {
-    loading.value = true;
+    const textToShare = generateShareText();
+    const success = copyToClipboard(textToShare);
     
-    const pokemonData = sessionStorage.getItem('selectedPokemon');
-    if (!pokemonData) {
-      error.value = 'Pokemon not found';
-      return;
-    }
-
-    pokemon.value = JSON.parse(pokemonData);
+    // Show success/failure message
+    shareStatus.value = success ? 'Copied to clipboard!' : 'Failed to copy!';
     
-    if (pokemon.value) {
-      const detailsData = await fetchPokemonDetailsFromStore(pokemon.value.name.toLowerCase());
-      details.value = detailsData;
-    }
-  } catch (err) {
-    console.error('Error al cargar los detalles del Pokémon:', err);
-    error.value = 'Failed to load Pokémon details';
-  } finally {
-    loading.value = false;
+    // Clear message after a delay
+    setTimeout(() => {
+      shareStatus.value = '';
+    }, 2000);
+  } catch (error) {
+    console.error('Copy operation failed:', error);
+    shareStatus.value = 'Copy failed';
+    setTimeout(() => {
+      shareStatus.value = '';
+    }, 2000);
   }
 };
 
-// Acciones de usuario
-const toggleFavoriteStatus = (event: Event) => {
-  event.stopPropagation();
+// Function to toggle favorite
+const toggleFavorite = () => {
   if (pokemon.value) {
-    // Llamar a la función del store y actualizar el estado local
     const updatedPokemon = toggleFavoriteInStore(pokemon.value);
+    pokemon.value = { ...updatedPokemon };
+  }
+};
+
+// Function to go back
+const goBack = () => {
+  router.go(-1);
+};
+
+// Initialization
+onMounted(async () => {
+  loading.value = true;
+  try {
+    const pokemonId = route.params.id as string;
     
-    // Actualizar el estado local para reflejar el cambio inmediatamente
-    if (updatedPokemon) {
-      pokemon.value = { ...updatedPokemon };
+    // Try to get from sessionStorage first
+    const storedPokemon = sessionStorage.getItem('selectedPokemon');
+    if (storedPokemon) {
+      try {
+        const parsedPokemon = JSON.parse(storedPokemon);
+        if (parsedPokemon.id.toString() === pokemonId || parsedPokemon.name.toLowerCase() === pokemonId.toLowerCase()) {
+          pokemon.value = parsedPokemon;
+        }
+      } catch (e) {
+        console.error('Error parsing stored Pokemon:', e);
+      }
     }
+    
+    // Fetch details in any case
+    const fetchedDetails = await fetchPokemonDetailsFromStore(pokemonId);
+    details.value = fetchedDetails;
+    
+    loading.value = false;
+  } catch (err) {
+    error.value = 'Error loading Pokemon details';
+    loading.value = false;
+    console.error('Error in component:', err);
   }
-};
-
-const handleShare = () => {
-  const shareText = generateShareText();
-  if (shareText && copyToClipboard(shareText)) {
-    showShareConfirmation();
-  }
-};
-
-const showShareConfirmation = () => {
-  shareStatus.value = 'copied';
-  setTimeout(() => {
-    shareStatus.value = '';
-  }, 2000);
-};
-
-const closeModal = () => {
-  router.back();
-};
-
-// Inicialización
-onMounted(loadPokemonDetails);
+});
 </script>
 
 <template>
-  <div class="modal-overlay" @click="closeModal">
+  <div class="modal-overlay" @click="goBack">
     <div class="modal-container" @click.stop>
-      <!-- Botón cerrar -->
-      <button class="close-button" @click="closeModal">
+      <!-- Close button -->
+      <button class="close-button" @click="goBack">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
           <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
         </svg>
       </button>
       
-      <!-- Mostrar carga -->
+      <!-- Show loading -->
       <div v-if="loading" class="loading">
         <p>Loading...</p>
       </div>
       
-      <!-- Mostrar error -->
+      <!-- Show error -->
       <div v-else-if="error" class="error">
         <p>{{ error }}</p>
       </div>
       
-      <!-- Mostrar detalles cuando estén disponibles -->
+      <!-- Show details when available -->
       <div v-else-if="pokemon && details" class="pokemon-details">
-        <!-- Imagen del Pokémon -->
+        <!-- Pokemon image -->
         <div class="pokemon-image">
           <img 
             :src="details.sprites.other['official-artwork'].front_default" 
@@ -152,7 +174,7 @@ onMounted(loadPokemonDetails);
           />
         </div>
         
-        <!-- Información del Pokémon -->
+        <!-- Pokemon information -->
         <div class="pokemon-info">
           <div class="info-item">
             <h2>Name: {{ pokemon.name }}</h2>
@@ -171,16 +193,16 @@ onMounted(loadPokemonDetails);
           </div>
         </div>
         
-        <!-- Acciones -->
+        <!-- Actions -->
         <div class="action-buttons">
-          <button class="share-button" @click="handleShare">
-            Share to my friends
-            <span v-if="shareStatus === 'copied'" class="share-confirmation">Copied!</span>
+          <button class="share-button" @click="sharePokemon">
+            Copy to clipboard
+            <span v-if="shareStatus" class="share-confirmation">{{ shareStatus }}</span>
           </button>
           <span 
             class="favorite-button" 
             :class="{ active: pokemon.favorite }"
-            @click="toggleFavoriteStatus($event)"
+            @click="toggleFavorite"
           >
             <img 
               :src="pokemon.favorite ? activeStar : disabledStar" 
@@ -337,6 +359,7 @@ onMounted(loadPokemonDetails);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 14px;
   animation: fadeInOut 2s forwards;
 }
 

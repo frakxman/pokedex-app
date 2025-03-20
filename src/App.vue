@@ -2,14 +2,14 @@
 import { useRoute } from 'vue-router'
 import { watch, ref, computed } from 'vue'
 
-// Estado para la transición actual
+// State for the current transition
 const route = useRoute()
 const transitionName = ref('fade')
 
-// Determinar si la ruta actual es un modal
+// Determine if the current route is a modal
 const isModal = computed(() => route.meta.modal === true)
 
-// Actualizar la transición cuando cambia la ruta
+// Update the transition when the route changes
 watch(
   () => route.meta.transition as string,
   (newTransition) => {
@@ -28,7 +28,7 @@ watch(
 </template>
 
 <style>
-/* Estilos globales para transiciones */
+/* Global styles for transitions */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -66,7 +66,7 @@ watch(
   transform: translateX(30px);
 }
 
-/* Media queries para mantener los estilos responsivos */
+/* Media queries to maintain responsive styles */
 @media (min-width: 768px) {
   body {
     background-color: white;

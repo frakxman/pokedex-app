@@ -3,15 +3,15 @@ import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { fetchPokemonList } from '../services/pokemonService';
 
-// Ya no necesitamos emitir eventos
+// We no longer need to emit events
 // const emit = defineEmits(['loaded']);
 const router = useRouter();
 
 onMounted(async () => {
   try {
-    // Cargar datos en segundo plano
+    // Load data in the background
     await fetchPokemonList();
-    // Ir a la lista de Pokémon usando el router
+    // Go to the Pokemon list using the router
     setTimeout(() => {
       // emit('loaded');
       router.push('/list');

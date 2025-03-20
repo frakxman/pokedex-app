@@ -6,26 +6,26 @@ import type { Pokemon } from '../interfaces/Pokemon';
 import { usePokemonStore } from '../stores/pokemonStore';
 import EmptyListScreen from './EmptyListScreen.vue';
 import NotFoundScreen from './NotFoundScreen.vue';
-// Importar imágenes
+// Import images
 import activeStar from '../assets/images/Active.png';
 import disabledStar from '../assets/images/Disabled.png';
 
 const emit = defineEmits(['select-pokemon', 'show-all']);
 
-// Acceder al store directamente
+// Access the store directly
 const pokemonStore = usePokemonStore();
 
-// Router para navegación
+// Router for navigation
 const router = useRouter();
 
-// Estado para la lista de favoritos
+// State for favorites list
 const searchQuery = ref('');
 const loading = ref(false);
 
-// Obtener la lista de favoritos del store
+// Get the favorites list from store
 const favorites = computed(() => pokemonStore.getFavorites);
 
-// Filtrar favoritos por búsqueda
+// Filter favorites by search query
 const filteredFavorites = computed(() => {
   if (!searchQuery.value) {
     return favorites.value;
@@ -37,33 +37,33 @@ const filteredFavorites = computed(() => {
   }
 });
 
-// Computar si no hay favoritos
+// Compute if there are favorites
 const hasFavorites = computed(() => favorites.value.length > 0);
 
-// Verificar si la búsqueda no tiene resultados
+// Check if search has no results
 const hasNoResults = computed(() => {
   return searchQuery.value !== '' && filteredFavorites.value.length === 0;
 });
 
-// Función para alternar favorito
+// Function to toggle favorite
 const togglePokemonFavorite = (pokemon: Pokemon, event: Event) => {
   event.stopPropagation();
   toggleFavoriteInStore(pokemon);
 };
 
-// Función para mostrar todos los Pokémon
+// Function to show all Pokemon
 const showAll = () => {
   router.push('/list');
 };
 
-// Función para seleccionar un Pokémon para ver sus detalles
+// Function to select a Pokemon to view its details
 const selectPokemon = (pokemon: Pokemon) => {
-  sessionStorage.setItem('selectedPokemon', JSON.stringify(pokemon));
-  router.push(`/pokemon/${pokemon.id}`);
+  // Navigate to the Pokemon details page
+  router.push(`/pokemon/${pokemon.name.toLowerCase()}`);
 };
 
-// Limpiar búsqueda
-const resetSearch = () => {
+// Clear search
+const clearSearch = () => {
   searchQuery.value = '';
 };
 </script>
@@ -84,7 +84,7 @@ const resetSearch = () => {
     <div v-if="hasNoResults" class="empty-content">
       <h2 class="title">Uh-oh!</h2>
       <p class="subtitle">You look lost on your journey!</p>
-      <button class="reset-button" @click="resetSearch">Go back home</button>
+      <button class="reset-button" @click="clearSearch">Go back home</button>
     </div>
     
     <!-- Mostrar mensaje de no favoritos -->

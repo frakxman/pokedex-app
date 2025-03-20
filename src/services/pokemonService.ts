@@ -1,9 +1,9 @@
-// Importaciones
+// Imports
 import type { Pokemon } from '../interfaces/Pokemon';
 import type { PokemonDetails } from '../interfaces/PokemonDetails';
 import { usePokemonStore } from '../stores/pokemonStore';
 
-// Funciones de servicio puras para interactuar con la API
+// Pure service functions to interact with the API
 export async function fetchPokemonList(): Promise<Pokemon[]> {
   try {
     const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=20');

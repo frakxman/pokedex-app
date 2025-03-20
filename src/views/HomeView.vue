@@ -8,22 +8,22 @@ import FavoritesList from '../components/FavoritesList.vue'
 import PokemonDetails from '../components/PokemonDetails.vue'
 import NotFoundScreen from '../components/NotFoundScreen.vue'
 
-// Estado para controlar qué pantalla mostrar
+// State to control which screen to show
 const currentScreen = ref('welcome') // welcome, loading, emptyList, list, favList, details
 const selectedPokemon = ref(null)
 
-// Función para cambiar de pantalla
+// Function to change screen
 const changeScreen = (screen: string) => {
   currentScreen.value = screen
 }
 
-// Función para seleccionar un Pokémon para ver sus detalles
+// Function to select a Pokemon to view its details
 const selectPokemon = (pokemon: any) => {
   selectedPokemon.value = pokemon
   changeScreen('details')
 }
 
-// Función para obtener el número de pantalla para el encabezado
+// Function to get the screen number for the header
 const getScreenNumber = () => {
   const screenMap: Record<string, number> = {
     'welcome': 1,
@@ -36,7 +36,7 @@ const getScreenNumber = () => {
   return screenMap[currentScreen.value]
 }
 
-// Función para obtener el título de la pantalla para el encabezado
+// Function to get the screen title for the header
 const getScreenTitle = () => {
   const titleMap: Record<string, string> = {
     'welcome': 'Welcome',
@@ -61,7 +61,7 @@ const goBack = () => {
   currentScreen.value = 'list'
 }
 
-// Proporcionar la función changeScreen para que sea accesible por los componentes hijos
+// Provide the changeScreen function to make it accessible by child components
 provide('changeScreen', changeScreen);
 </script>
 
@@ -113,7 +113,7 @@ main {
   overflow: visible;
 }
 
-/* Media queries para tablets y dispositivos más grandes */
+/* Media queries for tablets and larger devices */
 @media (min-width: 768px) {
   main {
     background-color: white;
@@ -130,7 +130,7 @@ main {
   }
 }
 
-/* Media queries para desktops */
+/* Media queries for desktops */
 @media (min-width: 1024px) {
   main {
     background-color: white;
@@ -148,10 +148,10 @@ main {
   }
 }
 
-/* Media queries para pantallas grandes */
+/* Media queries for large screens */
 @media (min-width: 1400px) {
   .screen-container {
-    max-width: 582px; /* Mantener el mismo ancho máximo */
+    max-width: 582px; /* Keep the same maximum width */
   }
 }
 </style>

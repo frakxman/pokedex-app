@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 
-// Definir interfaces para tipado
+// Define interfaces for typing
 interface PokemonData {
   id: number;
   name: string;
@@ -20,7 +20,7 @@ interface ComponentData {
   formattedWeight: string;
 }
 
-// Crear un componente mock para las pruebas
+// Create a mock component for tests
 const PokemonDetailsMock = {
   name: 'PokemonDetails',
   template: `
@@ -68,7 +68,7 @@ const PokemonDetailsMock = {
       this.pokemon.favorite = !this.pokemon.favorite;
     },
     closeModal() {
-      // Simular navegación
+      // Simulate navigation
     }
   }
 };
