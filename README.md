@@ -1,55 +1,107 @@
-# pokedex-app
+# 🎮 Pokedex App
 
-This template should help get you started developing with Vue 3 in Vite.
+A modern, responsive Pokedex application built with Vue 3, TypeScript, and Vite. This application provides a comprehensive interface for exploring and learning about Pokemon, featuring real-time data fetching, offline capabilities, and a beautiful user interface.
 
-## Recommended IDE Setup
+## 🌟 Features
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Real-time Pokemon Data**: Fetch and display Pokemon information from the PokeAPI
+- **Offline Support**: Browse Pokemon data even without internet connection
+- **Responsive Design**: Seamless experience across desktop and mobile devices
+- **Type Safety**: Built with TypeScript for enhanced development experience
+- **Modern UI**: Clean and intuitive interface with smooth animations
+- **Search & Filter**: Find Pokemon by name, type, or other attributes
+- **Detailed Views**: Comprehensive information about each Pokemon
+- **Share Functionality**: Share Pokemon information with others
 
-## Type Support for `.vue` Imports in TS
+## 🛠️ Tech Stack
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- **Framework**: Vue 3
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **State Management**: Vue Composition API
+- **Styling**: CSS Modules
+- **Testing**: Vitest
+- **API**: PokeAPI v2
 
-## Customize configuration
+## 📋 Prerequisites
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Node.js (v16 or higher)
+- npm (v7 or higher)
 
-## Project Setup
+## 🚀 Getting Started
 
-```sh
-npm install
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/frakxman/pokedex-app.git
+   cd pokedex-app
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for production**
+   ```bash
+   npm run build
+   ```
+
+## 🧪 Testing
+
+Run the test suite:
+```bash
+npm run test
 ```
 
-### Compile and Hot-Reload for Development
+## 📁 Project Structure
 
-```sh
-npm run dev
+```
+pokedex-app/
+├── src/
+│   ├── components/     # Reusable Vue components
+│   ├── views/         # Page components
+│   ├── services/      # API and business logic
+│   ├── types/         # TypeScript type definitions
+│   ├── utils/         # Helper functions
+│   └── tests/         # Test files
+├── public/            # Static assets
+└── index.html         # Entry HTML file
 ```
 
-### Type-Check, Compile and Minify for Production
+## 🔧 Configuration
 
-```sh
-npm run build
-```
+The application can be configured through environment variables:
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+- `VITE_API_BASE_URL`: Base URL for the PokeAPI
+- `VITE_APP_TITLE`: Application title
 
-```sh
-npm run test:unit
-```
+## 🤝 Contributing
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-```sh
-npm run test:e2e:dev
-```
+## 📝 License
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
+## 🙏 Acknowledgments
 
-```sh
-npm run build
-npm run test:e2e
-```
+- [PokeAPI](https://pokeapi.co/) for providing the Pokemon data
+- [Vue.js](https://vuejs.org/) team for the amazing framework
+- All contributors who have helped shape this project
+
+## 📞 Support
+
+For support, please open an issue in the GitHub repository or contact the maintainers.
+
+---
+
+Made with ❤️ by Frakxman
