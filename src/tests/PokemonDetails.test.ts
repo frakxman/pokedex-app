@@ -2,6 +2,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { createPinia, setActivePinia } from 'pinia';
 
+// Definir interfaces para tipado
+interface PokemonData {
+  id: number;
+  name: string;
+  favorite: boolean;
+}
+
+interface ComponentData {
+  pokemon: PokemonData;
+  details: any;
+  loading: boolean;
+  error: null | string;
+  shareStatus: string;
+  formattedTypes: string;
+  formattedHeight: string;
+  formattedWeight: string;
+}
+
 // Crear un componente mock para las pruebas
 const PokemonDetailsMock = {
   name: 'PokemonDetails',
@@ -21,7 +39,7 @@ const PokemonDetailsMock = {
       <button class="close-button" @click="closeModal">Close</button>
     </div>
   `,
-  data() {
+  data(): ComponentData {
     return {
       pokemon: { id: 1, name: 'Bulbasaur', favorite: false },
       details: {
@@ -40,13 +58,13 @@ const PokemonDetailsMock = {
     };
   },
   methods: {
-    handleShare() {
+    handleShare(this: ComponentData) {
       this.shareStatus = 'copied';
       setTimeout(() => {
         this.shareStatus = '';
       }, 2000);
     },
-    toggleFavoriteStatus() {
+    toggleFavoriteStatus(this: ComponentData) {
       this.pokemon.favorite = !this.pokemon.favorite;
     },
     closeModal() {
@@ -117,13 +135,14 @@ describe('PokemonDetails Component', () => {
   
   it('debería cambiar el estado de favorito cuando se hace clic en el botón de favorito', async () => {
     const wrapper = mount(PokemonDetailsMock);
-    const initialState = wrapper.vm.pokemon.favorite;
+    const pokemon = (wrapper.vm as any).pokemon as PokemonData;
+    const initialState = pokemon.favorite;
     
     // Simular clic en el botón
     await wrapper.find('.favorite-button').trigger('click');
     
     // Verificar que el estado cambió
-    expect(wrapper.vm.pokemon.favorite).toBe(!initialState);
+    expect(pokemon.favorite).toBe(!initialState);
   });
   
   it('debería mostrar el mensaje de confirmación después de hacer clic en el botón compartir', async () => {
