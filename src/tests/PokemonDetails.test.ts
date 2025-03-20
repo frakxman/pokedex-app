@@ -101,10 +101,10 @@ vi.mock('../services/pokemonService', () => ({
 
 describe('PokemonDetails Component', () => {
   beforeEach(() => {
-    // Crear una instancia nueva de Pinia para cada test
+    // Create a new Pinia instance for each test
     setActivePinia(createPinia());
     
-    // Mock de sessionStorage
+    // Mock sessionStorage
     vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(JSON.stringify({
       id: 1,
       name: 'Bulbasaur',
@@ -112,49 +112,49 @@ describe('PokemonDetails Component', () => {
       favorite: false
     }));
     
-    // Mock del document.execCommand para el clipboard
+    // Mock document.execCommand for clipboard
     document.execCommand = vi.fn().mockReturnValue(true);
   });
   
-  it('debería renderizar correctamente el componente', () => {
+  it('should render the component correctly', () => {
     const wrapper = mount(PokemonDetailsMock);
     
-    // Verificar que el componente se renderiza
+    // Verify that the component renders
     expect(wrapper.exists()).toBe(true);
   });
   
-  it('debería mostrar la información del Pokémon', () => {
+  it('should display the Pokemon information', () => {
     const wrapper = mount(PokemonDetailsMock);
     
-    // Verificar que la información se muestra
+    // Verify the information is displayed
     expect(wrapper.text()).toContain('Bulbasaur');
     expect(wrapper.text()).toContain('69kg');
     expect(wrapper.text()).toContain('0.7m');
     expect(wrapper.text()).toContain('Grass, Poison');
   });
   
-  it('debería cambiar el estado de favorito cuando se hace clic en el botón de favorito', async () => {
+  it('should change the favorite status when the favorite button is clicked', async () => {
     const wrapper = mount(PokemonDetailsMock);
     const pokemon = (wrapper.vm as any).pokemon as PokemonData;
     const initialState = pokemon.favorite;
     
-    // Simular clic en el botón
+    // Simulate button click
     await wrapper.find('.favorite-button').trigger('click');
     
-    // Verificar que el estado cambió
+    // Verify that the state changed
     expect(pokemon.favorite).toBe(!initialState);
   });
   
-  it('debería mostrar el mensaje de confirmación después de hacer clic en el botón compartir', async () => {
+  it('should show the confirmation message after clicking the share button', async () => {
     const wrapper = mount(PokemonDetailsMock);
     
-    // Verificar que el mensaje de confirmación no está inicialmente
+    // Verify that the confirmation message is not initially present
     expect(wrapper.find('.share-confirmation').exists()).toBe(false);
     
-    // Simular clic en el botón
+    // Simulate button click
     await wrapper.find('.share-button').trigger('click');
     
-    // Verificar que el mensaje aparece
+    // Verify that the message appears
     expect(wrapper.find('.share-confirmation').exists()).toBe(true);
     expect(wrapper.find('.share-confirmation').text()).toBe('Copied!');
   });

@@ -80,24 +80,24 @@ const clearSearch = () => {
       </div>
     </div>
     
-    <!-- Mostrar mensaje de no resultados de búsqueda -->
+    <!-- Display no search results message -->
     <div v-if="hasNoResults" class="empty-content">
       <h2 class="title">Uh-oh!</h2>
       <p class="subtitle">You look lost on your journey!</p>
       <button class="reset-button" @click="clearSearch">Go back home</button>
     </div>
     
-    <!-- Mostrar mensaje de no favoritos -->
+    <!-- Display no favorites message -->
     <div v-else-if="!hasFavorites">
       <NotFoundScreen @go-back="showAll" />
     </div>
     
-    <!-- Mostrar indicador de carga -->
+    <!-- Display loading indicator -->
     <div v-else-if="loading" class="loading-indicator">
       <p>Loading favorites...</p>
     </div>
     
-    <!-- Mostrar la lista de favoritos -->
+    <!-- Display favorites list -->
     <div v-else class="pokemon-list">
       <button 
         v-for="pokemon in filteredFavorites" 

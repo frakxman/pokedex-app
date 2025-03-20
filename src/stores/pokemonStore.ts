@@ -4,7 +4,10 @@ import { fetchPokemonList as fetchPokemonListService,
          fetchPokemonDetails as fetchPokemonDetailsService,
          loadMorePokemon as loadMorePokemonService } from '../services/pokemonService';
 
-// Store to handle global Pokemon state using Pinia
+/**
+ * Pokemon store for managing global Pokemon state
+ * Contains all Pokemon data, favorites, and loading state
+ */
 export const usePokemonStore = defineStore('pokemon', {
   state: () => ({
     pokemonList: [] as Pokemon[],
@@ -13,11 +16,26 @@ export const usePokemonStore = defineStore('pokemon', {
   }),
   
   getters: {
+    /**
+     * Get all favorited Pokemon
+     * @returns Array of favorite Pokemon objects
+     */
     getFavorites: (state) => state.favorites,
+    
+    /**
+     * Get all Pokemon in the list
+     * @returns Array of Pokemon objects
+     */
     getPokemonList: (state) => state.pokemonList,
   },
   
   actions: {
+    /**
+     * Fetches the initial Pokemon list if not already loaded
+     * Marks Pokemon as favorites if they exist in the favorites list
+     * 
+     * @returns Promise that resolves to an array of Pokemon objects
+     */
     async fetchPokemonList() {
       if (this.pokemonList.length > 0) return this.pokemonList;
       
@@ -40,6 +58,13 @@ export const usePokemonStore = defineStore('pokemon', {
       }
     },
     
+    /**
+     * Fetches detailed information for a specific Pokemon
+     * Updates the Pokemon in the list with the detailed information
+     * 
+     * @param name - The name of the Pokemon to fetch details for
+     * @returns Promise that resolves to the Pokemon details
+     */
     async fetchPokemonDetails(name: string) {
       try {
         const details = await fetchPokemonDetailsService(name);
@@ -57,6 +82,13 @@ export const usePokemonStore = defineStore('pokemon', {
       }
     },
     
+    /**
+     * Toggles the favorite status of a Pokemon
+     * Adds or removes the Pokemon from the favorites array
+     * 
+     * @param pokemon - The Pokemon object to toggle favorite status
+     * @returns The updated Pokemon object
+     */
     toggleFavorite(pokemon: Pokemon) {
       const index = this.pokemonList.findIndex(p => p.id === pokemon.id);
       
@@ -80,7 +112,13 @@ export const usePokemonStore = defineStore('pokemon', {
       return pokemon;
     },
     
-    // Function to load more Pokemon
+    /**
+     * Loads more Pokemon with pagination
+     * Appends new Pokemon to the existing list
+     * Marks new Pokemon as favorites if they exist in the favorites list
+     * 
+     * @returns Promise that resolves to the updated Pokemon list
+     */
     async loadMorePokemon() {
       const offset = this.pokemonList.length;
       
@@ -104,7 +142,13 @@ export const usePokemonStore = defineStore('pokemon', {
       }
     },
     
-    // Copy Pokemon information to clipboard
+    /**
+     * Copies Pokemon information to the clipboard
+     * Uses multiple methods for cross-browser compatibility
+     * 
+     * @param pokemon - The Pokemon object to share
+     * @returns The formatted text that was copied to clipboard
+     */
     sharePokemon(pokemon: Pokemon) {
       if (!pokemon.details) return '';
       
@@ -114,7 +158,10 @@ export const usePokemonStore = defineStore('pokemon', {
       // Log of the information that will be copied to clipboard
       console.log('Attempting to copy to clipboard:', shareText);
       
-      // Main method using Clipboard API
+      /**
+       * Attempts to copy text using the modern Clipboard API
+       * @returns Promise that resolves to a boolean indicating success
+       */
       const copyWithClipboardAPI = () => {
         return navigator.clipboard.writeText(shareText)
           .then(() => {
@@ -127,7 +174,10 @@ export const usePokemonStore = defineStore('pokemon', {
           });
       };
       
-      // Fallback method using document.execCommand (old method)
+      /**
+       * Attempts to copy text using the legacy document.execCommand method
+       * @returns Boolean indicating success
+       */
       const copyWithExecCommand = () => {
         try {
           // Create a temporary element
